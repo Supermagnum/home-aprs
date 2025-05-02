@@ -79,3 +79,5 @@ aprs_radio_tuner:
 - Optional speech announcement or TTS notification
 - Track which stations repeat QRV alerts
 - Integrate with maps to visualize QRV coverage
+
+## WARNING: this addon is untested! 
