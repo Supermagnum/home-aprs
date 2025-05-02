@@ -1,0 +1,8 @@
+{
+  "domain": "aprs_radio_tuner",
+  "name": "APRS Radio Tuner",
+  "documentation": "https://www.home-assistant.io/integrations/aprs_radio_tuner",
+  "dependencies": [],
+  "codeowners": ["@your_username"],
+  "requirements": ["pyaprs", "pyhamlib", "geopy"]
+}

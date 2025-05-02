@@ -1,0 +1,14 @@
+{
+  "title": "APRS Radio Tuner",
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "latitude": "Your Latitude",
+          "longitude": "Your Longitude",
+          "radius": "Radius (km)"
+        }
+      }
+    }
+  }
+}
