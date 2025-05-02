@@ -18,6 +18,8 @@ def tune_radio(frequency):
         _LOGGER.error(f"Error tuning radio: {e}")
 
 def extract_frequency(aprs_message):
+    if "qrv" not in aprs_message.lower():
+        return None
     match = re.search(FREQUENCY_REGEX, aprs_message)
     if match:
         return float(match.group(1).replace(',', '.'))
