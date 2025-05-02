@@ -1,61 +1,54 @@
 import logging
-import re
-from geopy.distance import geodesic
-from homeassistant.helpers.entity import Entity
-from homeassistant.helpers import discovery
-import hamlib
+import requests
+import voluptuous as vol
+from datetime import timedelta
+from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_RADIUS
+from .config_flow import CONF_API_KEY
 
-DEFAULT_RADIUS = 50  # Default radius in km
+DOMAIN = "aprs_radio_tuner"
 _LOGGER = logging.getLogger(__name__)
-FREQUENCY_REGEX = r"(\d{1,3}(?:[.,]\d{3})?)\s*MHz"
 
-def tune_radio(frequency):
-    try:
-        radio = hamlib.hamlib()
-        radio.set_freq(frequency * 1_000_000)
-        _LOGGER.info(f"Radio tuned to {frequency} MHz")
-    except Exception as e:
-        _LOGGER.error(f"Error tuning radio: {e}")
+SCAN_INTERVAL = timedelta(minutes=1)
+FREQUENCY_REGEX = r"(\d{3}[.,]\d{1,3})\s*MHz"
 
 def extract_frequency(aprs_message):
     if "qrv" not in aprs_message.lower():
         return None
+    import re
     match = re.search(FREQUENCY_REGEX, aprs_message)
     if match:
         return float(match.group(1).replace(',', '.'))
     return None
 
-def process_aprs_message(aprs_message, user_lat, user_lon, radius_km=DEFAULT_RADIUS):
-    frequency = extract_frequency(aprs_message)
-    if frequency is None:
-        return None
-    loc_match = re.search(r"(\-?\d+\.\d+),(\-?\d+\.\d+)", aprs_message)
-    if loc_match:
-        lat, lon = float(loc_match.group(1)), float(loc_match.group(2))
-        if geodesic((lat, lon), (user_lat, user_lon)).km <= radius_km:
-            return frequency
-    return None
+async def async_setup(hass, config):
+    return True
 
-class AprsRadioTunerEntity(Entity):
-    def __init__(self, name, aprs_message, user_lat, user_lon, radius_km=DEFAULT_RADIUS):
-        self._name = name
-        self._aprs_message = aprs_message
-        self._user_lat = user_lat
-        self._user_lon = user_lon
-        self._radius_km = radius_km
-        self._frequency = process_aprs_message(aprs_message, user_lat, user_lon, radius_km)
+async def async_setup_entry(hass, entry):
+    lat = entry.data[CONF_LATITUDE]
+    lon = entry.data[CONF_LONGITUDE]
+    radius_km = entry.data[CONF_RADIUS]
+    api_key = entry.data[CONF_API_KEY]
 
-    @property
-    def name(self):
-        return self._name
+    async def poll_aprsfi(now):
+        try:
+            bbox = f"{lon - 0.1},{lat - 0.1},{lon + 0.1},{lat + 0.1}"
+            url = f"https://api.aprs.fi/api/get?bbox={bbox}&what=loc&apikey={api_key}&format=json"
+            response = requests.get(url, timeout=10)
+            data = response.json()
 
-    @property
-    def state(self):
-        return f"Frequency: {self._frequency} MHz" if self._frequency else "No Frequency Found"
+            if "entries" in data:
+                for station in data["entries"]:
+                    comment = station.get("comment", "")
+                    freq = extract_frequency(comment)
+                    if freq:
+                        _LOGGER.info(f"Tuning radio to {freq} MHz from {station['name']}")
+                        requests.post("http://localhost:5000/radio/tune", json={"frequency": freq})
+                        hass.components.persistent_notification.create(
+                            f"{station['name']} is QRV on {freq} MHz", title="APRS QRV Alert"
+                        )
+        except Exception as e:
+            _LOGGER.error(f"Error polling aprs.fi: {e}")
 
-    def turn_on(self):
-        if self._frequency:
-            tune_radio(self._frequency)
-
-    def turn_off(self):
-        pass
+    async_track_time_interval(hass, poll_aprsfi, SCAN_INTERVAL)
+    return True

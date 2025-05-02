@@ -4,6 +4,7 @@ from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_RADIUS
 import logging
 
 _LOGGER = logging.getLogger(__name__)
+CONF_API_KEY = "aprs_fi_api_key"
 
 class AprsRadioTunerConfigFlow(config_entries.ConfigFlow, domain="aprs_radio_tuner"):
     VERSION = 1
@@ -17,5 +18,6 @@ class AprsRadioTunerConfigFlow(config_entries.ConfigFlow, domain="aprs_radio_tun
                 vol.Required(CONF_LATITUDE): float,
                 vol.Required(CONF_LONGITUDE): float,
                 vol.Optional(CONF_RADIUS, default=50): int,
+                vol.Required(CONF_API_KEY): str,
             }),
         )

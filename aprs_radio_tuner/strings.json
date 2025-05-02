@@ -6,7 +6,8 @@
         "data": {
           "latitude": "Your Latitude",
           "longitude": "Your Longitude",
-          "radius": "Radius (km)"
+          "radius": "Radius (km)",
+          "aprs_fi_api_key": "APRS.fi API Key"
         }
       }
     }
