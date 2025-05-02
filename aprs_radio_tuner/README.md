@@ -1,21 +1,21 @@
 # APRS Radio Tuner for Home Assistant
 
-This custom integration monitors APRS messages and automatically tunes your Ham radio (via [Hamlib](https://hamlib.github.io/)) to any QRV frequency announced by a station within a configurable radius of your location.
+This custom integration monitors APRS.FI messages and automatically tunes your Ham radio (via [Hamlib](https://hamlib.github.io/)) to any QRV frequency announced by a station within a configurable radius of your location.
 
 ## Features
 
-- Monitors APRS messages for QRV frequencies (e.g., `145.500MHz`, `145,500MHz`)
+- Monitors APRS.FI messages for QRV frequencies (e.g., `145.500MHz`, `145,500MHz`)
 - Parses frequency and geographic coordinates from APRS messages
 - Checks if the station is within a user-defined radius
 - Tunes a Hamlib-compatible radio to the extracted frequency
 - Optional UI to configure latitude, longitude, and radius
 - Notifies user when a valid APRS station is detected
+- You will need a aprs.fi api key.
 
 ## Installation
 
 1. **Download and extract the integration:**
 
-   [📦 Download aprs_radio_tuner.zip](sandbox:/mnt/data/aprs_radio_tuner.zip)
 
 2. **Place the contents** in your Home Assistant configuration folder:
    ```
@@ -42,6 +42,7 @@ You'll be prompted to enter:
 - **Latitude:** Your home’s latitude
 - **Longitude:** Your home’s longitude
 - **Radius:** Detection area in kilometers (default: 50 km)
+- your aprs.fi api key.
 
 ### Example YAML (Advanced / Manual Setup)
 
