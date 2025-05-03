@@ -5,7 +5,7 @@ This custom integration monitors APRS messages and automatically tunes your Ham 
 
 ## Features
 
-- Monitors APRS messages for QRV frequencies (e.g., `145.500MHz`, `145,500MHz`)
+- Monitors APRS.FI messages for QRV frequencies (e.g., `145.500MHz`, `145,500MHz`)
 - Parses frequency and geographic coordinates from APRS messages
 - Checks if the station is within a user-defined radius
 - Tunes a Hamlib-compatible radio to the extracted frequency
@@ -42,6 +42,7 @@ You'll be prompted to enter:
 - **Latitude:** Your home’s latitude
 - **Longitude:** Your home’s longitude
 - **Radius:** Detection area in kilometers (default: 50 km)
+- ** Your APRS.FI api key.
 
 ### Example YAML (Advanced / Manual Setup)
 
